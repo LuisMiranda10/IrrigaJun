@@ -26,9 +26,12 @@
     "@capacitor/status-bar": "4.1.1",
     "@ionic/angular": "^6.1.9",
     "date-fns": "^2.29.3",
+    "events": "^3.3.0",
     "ionicons": "^6.0.3",
+    "mqtt": "^4.3.7",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
+    "url": "^0.11.0",
     "zone.js": "~0.11.4"
   },
   "devDependencies": {

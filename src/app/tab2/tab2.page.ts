@@ -1,7 +1,9 @@
 import { Component, ViewChild } from '@angular/core';
 import { IonDatetime } from '@ionic/angular';
 import { ToastController } from '@ionic/angular';
+
 import { format, parseISO } from 'date-fns';
+import { MqttService } from '../services/mqtt.service';
 
 @Component({
   selector: 'app-tab2',
@@ -10,24 +12,23 @@ import { format, parseISO } from 'date-fns';
 })
 export class Tab2Page {
 
+  @ViewChild(IonDatetime)
+  private datetime!: IonDatetime;
+  private valorData = format(new Date(), 'dd/MM/yyyy');
+  private value = "";
+  public inputData : string = '';
+  public inputNota :string = '';
+  private nota : string = '';
+  private showPicker = false;
+  public inputHorarioI = '';
+  public inputHorarioF = '';
+  private horarioI = '';
+  private horarioF = '';
+  private dataFormatada = '';
+
   constructor(private toastController: ToastController) {
     this.dataAtual();
   }
-
-  @ViewChild(IonDatetime)
-  datetime!: IonDatetime;
-  valorData = format(new Date(), 'dd/MM/yyyy');
-  value = "";
-  inputData : string = '';
-  inputNota :string = '';
-  nota : string = '';
-  showPicker = false;
-  inputHorarioI = '';
-  inputHorarioF = '';
-  horarioI = '';
-  horarioF = '';
-
-  dataFormatada = '';
 
   dataAtual() {
     this.dataFormatada = format(new Date(), 'dd/MM/yyyy');
@@ -83,6 +84,30 @@ export class Tab2Page {
     return true;
   }
 
+  inputsVerification() {
+    if (this.inputData == '' || this.inputHorarioI == '' || this.inputHorarioF == '') {
+      return false;
+    }
+
+
+    if (Number(this.inputHorarioI) < Number(format(new Date(), 'HH'))) {
+      return false;
+    }
+
+    let actualYear = Number(format(new Date(), 'yyyy'))
+    let actualMonth = Number(format(new Date(), 'MM'))
+    let actualDay = Number(format(new Date(), 'dd'))
+
+    let inputYear = Number(format(parseISO(this.inputData), 'yyyy'))
+    let inputMonth = Number(format(parseISO(this.inputData), 'MM'))
+    let inputDay = Number(format(parseISO(this.inputData), 'dd'))
+    if (inputYear < actualYear || inputMonth < actualMonth || inputDay < actualDay) {
+      return false;
+    }
+
+    return true;
+  }
+
   async avisoToast() {
     const toast = await this.toastController.create({
       message: 'Preencha todos os campos',
@@ -105,7 +130,7 @@ export class Tab2Page {
     await toast.present();
   }
 
-  async erroCamposToast() {
+  async errorInputsToast() {
     const toast = await this.toastController.create({
       message: 'Verifique os campos corretamente',
       duration: 1500,
@@ -117,15 +142,22 @@ export class Tab2Page {
   }
 
   salvarAgendamento() {
-    
-    if (this.inputNota == '' || this.inputHorarioI == '' || this.inputHorarioF == '') {
+    if(this.inputsVerification()) {
+      this.confirmaçãoToast();
+      console.log(this.inputData);
+      console.log(this.inputHorarioI + ' - ' + this.inputHorarioF);
+      MqttService.sendMqttMessage('{Data: ' + this.inputData + ', Horario: ' + this.inputHorarioI + ' - ' + this.inputHorarioF + ', Nota: ' + this.nota + '}');
+    } else if(this.inputData == '' || this.inputHorarioI == '' || this.inputHorarioF == '') {
       this.avisoToast();
+      console.log('aviso');
     } else {
-      let count = 0;
-      this.salvarHorarioI() ? count : count++;
-      this.salvarHorarioF() ? count : count++;
-  
-      count <=0 ? this.confirmaçãoToast() : this.erroCamposToast()
+      this.errorInputsToast();
+      console.log('erro');
     }
+
+    this.inputData = '';
+    this.inputHorarioI = '';
+    this.inputHorarioF = '';
+    this.inputNota = '';
   } 
 }
