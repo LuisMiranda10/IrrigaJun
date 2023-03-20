@@ -6,12 +6,11 @@ const mqtt = require('mqtt');
 })
 export class MqttService {
   static sendMqttMessage(arg0: string) {
-    throw new Error('Method not implemented.');
   }
 
   private clientId = 'mqttjs_' + Math.random().toString(8).substr(2, 4);
   private client = mqtt.connect('mqtt://test.mosquitto.org', {clientId: this.clientId});
-  private topic : string
+  private topic : string;
 
 
   constructor() {  
