@@ -16,7 +16,7 @@ export class Tab2Page implements OnInit{
 
   @ViewChild(IonDatetime)
   events: any[] = [];
-  private deviceID: string = "Eletronjun";
+  private deviceID: string = "eletronjun";
   subscription: Subscription = new Subscription;
   private datetime!: IonDatetime;
   private valorData = format(new Date(), 'dd/MM/yyyy');

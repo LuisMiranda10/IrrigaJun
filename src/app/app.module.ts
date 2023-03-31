@@ -13,7 +13,7 @@ import { environment as env } from '../environments/environment';
 const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
   hostname: env.mqtt.server,
   port: env.mqtt.port,
-  protocol: (env.mqtt.protocol === "wss") ? "wss" : "ws",
+  protocol: (env.mqtt.protocol === "mqtt") ? "wss" : "ws",
   path: '',
 };
 

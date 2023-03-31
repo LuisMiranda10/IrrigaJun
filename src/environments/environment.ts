@@ -6,8 +6,8 @@ export const environment = {
   production: false,
   mqtt : {
     server: 'test.mosquitto.org',
-    protocol: "wss",
-    port: 1883
+    protocol: "websockets",
+    port: 8080,
   }
 };
 
