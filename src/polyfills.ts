@@ -46,13 +46,18 @@
  * Zone JS is required by default for Angular itself.
  */
 import 'zone.js';  // Included with Angular CLI.
-import { Buffer } from 'buffer';
-const mqtt = require('mqtt');
+import * as buffer from 'buffer';
 
-// @ts-ignore
-window.Buffer = Buffer;
-
+(window as any).Buffer = buffer;
 
 /***************************************************************************************************
  * APPLICATION IMPORTS
  */
+//Mario da Rossi - Precensial
+//Pedro Sanches - 
+//Roberto 
+//Presidente da IEEE
+
+//marketing
+//- Fazendo a arte dos cartazes
+//- Esperando as informações dos palestrantes confirmados
