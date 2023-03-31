@@ -1,18 +1,23 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
 import { IonDatetime } from '@ionic/angular';
 import { ToastController } from '@ionic/angular';
 
 import { format, parseISO } from 'date-fns';
-import { MqttService } from '../services/mqtt.service';
+import { EventMqttService } from '../services/event.mqtt.service';
+import { IMqttMessage } from 'ngx-mqtt';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
   styleUrls: ['tab2.page.scss']
 })
-export class Tab2Page {
+export class Tab2Page implements OnInit{
 
   @ViewChild(IonDatetime)
+  events: any[] = [];
+  private deviceID: string = "Eletronjun";
+  subscription: Subscription = new Subscription;
   private datetime!: IonDatetime;
   private valorData = format(new Date(), 'dd/MM/yyyy');
   private value = "";
@@ -26,8 +31,26 @@ export class Tab2Page {
   private horarioF = '';
   private dataFormatada = '';
 
-  constructor(private toastController: ToastController) {
+  constructor(private toastController: ToastController, private readonly eventMqtt: EventMqttService) {
     this.dataAtual();
+  }
+
+  ngOnInit() {
+    this.subscribeToTopic();
+  }
+
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  }
+
+  private subscribeToTopic() {
+    this.subscription = this.eventMqtt.topic(this.deviceID)
+      .subscribe( (data: IMqttMessage) => {
+        let item = JSON.parse(data.payload.toString());
+        this.events.push(item);
+      });
   }
 
   dataAtual() {
@@ -142,16 +165,19 @@ export class Tab2Page {
   }
 
   salvarAgendamento() {
-    if(this.inputsVerification()) {
+    if(1) {
       this.confirmaçãoToast();
       console.log(this.inputData);
       console.log(this.inputHorarioI + ' - ' + this.inputHorarioF);
-      MqttService.sendMqttMessage('{Data: ' + this.inputData + ', Horario: ' + this.inputHorarioI + ' - ' + this.inputHorarioF + ', Nota: ' + this.nota + '}');
+
+      this.eventMqtt.unsafePublish('eletronjun', "TO aqui");
+      console.log("mensagem enviada");
+
     } else if(this.inputData == '' || this.inputHorarioI == '' || this.inputHorarioF == '') {
-      this.avisoToast();
+      this.errorInputsToast();
       console.log('aviso');
     } else {
-      this.errorInputsToast();
+      this.avisoToast();
       console.log('erro');
     }
 
